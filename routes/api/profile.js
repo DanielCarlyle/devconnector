@@ -8,6 +8,7 @@ const { check, validationResult } = require("express-validator/check");
 //Bring in the Models
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
+const Post = require("../../models/Post");
 
 // @route GET api/profile/me is the endpoint
 // @description Get Current Users profile
@@ -30,10 +31,6 @@ router.get("/me", auth, async (req, res) => {
   }
 });
 
-// @route    POST api/profile/
-// @desc     Create or Update a User Profile
-// @access   Private
-
 // @route    POST api/profile
 // @desc     Create or update user profile
 // @access   Private
@@ -51,11 +48,13 @@ router.post(
     ]
   ],
   async (req, res) => {
+    //check for body errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
+    //Pull everything out from the body
     const {
       company,
       website,
@@ -71,7 +70,8 @@ router.post(
       linkedin
     } = req.body;
 
-    // Build profile object
+    // Build profile object to insert into the DB
+    //check if it is coming in before we set it
     const profileFields = {};
     profileFields.user = req.user.id;
     if (company) profileFields.company = company;
@@ -123,7 +123,9 @@ router.post(
 // @access   Public
 router.get("/", async (req, res) => {
   try {
+    //Using the Profile Model and Populate from the User Collection with an array of fields - name and avatar
     const profiles = await Profile.find().populate("user", ["name", "avatar"]);
+    //send along the Profiles
     res.json(profiles);
   } catch (err) {
     console.error(err.message);
@@ -196,6 +198,7 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    //getting the body data
     const {
       title,
       company,
@@ -217,8 +220,10 @@ router.put(
     };
 
     try {
+      //create a variable to attach the experience to a particular profile
       const profile = await Profile.findOne({ user: req.user.id });
 
+      //take the experience array and push the experience onto the start, so the most recent experience is first
       profile.experience.unshift(newExp);
 
       await profile.save();
