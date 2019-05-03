@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-//bring in the middleware
 const auth = require("../../middleware/auth");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
