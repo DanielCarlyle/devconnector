@@ -31,7 +31,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    //Adding a variable allows you to stop manually adding re.body e.e.g, all the time
+    //Adding a variable allows you to stop manually adding re.body e.g, all the time
     const { name, email, password } = req.body;
 
     try {
